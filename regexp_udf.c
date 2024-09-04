@@ -51,8 +51,18 @@ static void trans_regexp_udf(sqlite3_context *context, int argc, sqlite3_value *
 		// Execute regular expression
 		reti = regexec(&regex, pszText, 0, NULL, 0);
 
+		// reti returns a 0 if it matches and 1 if it doesn't
+		// which doesn't follow a boolean value
+		// Adding New variable to return an 1 if it matches regexp and 0 if it doesn't
+		int result_boolean;
+		if (reti == 0) {
+			result_boolean = 1;
+		} else if (reti == 1) {
+			result_boolean = 0;
+		}
+
 		// Cast or assign reti to pRes
-		snprintf(pRes, sizeof(pRes), "%d", reti);
+		snprintf(pRes, sizeof(pRes), "%d", result_boolean);
 
 		AR_AO_SQLITE->sqlite3_result_text(context, pRes, -1, SQLITE_TRANSIENT);
 		AR_AO_LOG->log_trace("Before %s", "return");
